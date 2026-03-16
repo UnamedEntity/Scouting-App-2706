@@ -3,7 +3,7 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Image } from 'expo-image';
 import { useState } from 'react';
-import { Button, TextInput, View, StyleSheet, SafeAreaView, TouchableOpacity } from 'react-native';
+import { Button, SafeAreaView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 
 // Reusable CheckboxGroup
@@ -44,23 +44,18 @@ export default function HomeScreen() {
     startLocation: '',
     shooterScale: 1,
     accuracyScale: 1,
-    shootLocation: '',
+    shootLocationTeleop: '',
+    shootLocationAuto: '',
     bump: false,
     trench: false,
     intakeLocation: [],
     inactivePeriod: '',
-    // Second program fields
-    sizeOfHoppper: 0,
-    typeOfShooter: 0,
-    possibleClimbs: [],
-    travel: [],
-    intake: [],
-    pitNotes: '',
     actualClimb: '',
     typeOfRobot: [],
     endNotes: '',
     autoMortality: '',
-    shootingLocation: '',
+    shootingLocationTeleop: '',
+    shootingLocationAuto: '',
     underTrench: '',
     overBump: '',
     climbOptions: '',
@@ -81,7 +76,6 @@ export default function HomeScreen() {
   const typeOfRobotOptions = ['Defense', 'Shooter', 'Feeder'];
   const finalClimbOptions = ['No Climb', 'Level 1', 'Level 2', 'Level 3'];
   const climbOptions = ['Level 1', 'Did not attempt climb', 'Attempted climb but failed'];
-  const travelOptions = ['Bump', 'Trench'];
 
   // Handlers
   const handleSingleSelect = (field, value) => {
@@ -158,7 +152,7 @@ export default function HomeScreen() {
           />
 
 
-         <ThemedText style={styles.label}>Auto Mortality:</ThemedText>
+         <ThemedText style={styles.label}>Dead?:</ThemedText>
           <CheckboxGroup
             options={yesNoOptions}
             selectedValues={[scoutingData.autoMortality].filter(Boolean)}
@@ -182,25 +176,35 @@ export default function HomeScreen() {
         <ThemedText style={styles.label}>Intake:</ThemedText>
           <CheckboxGroup
             options={intakeLocationsOptions}
-            selectedValues={scoutingData.intake}
-            onToggle={(option) => handleMultiSelect('intake', option)}
+            selectedValues={scoutingData.intakeLocations}
+            onToggle={(option) => handleMultiSelect('intakeLocations', option)}
           />
 
-          <ThemedText style={styles.label}>Climb Options:</ThemedText>
+           <ThemedText style={styles.label}>Shooting Location(s):</ThemedText>
+          <TextInput
+            placeholder="e.g., Against Hub, From Trench"
+            value={scoutingData.shootLocationAuto || scoutingData.shootingLocationAuto}
+            onChangeText={(input) =>
+              setScoutingData({ ...scoutingData, shootLocationAuto: input, shootingLocationAuto: input })
+            }
+            style={styles.input}
+          />
+
+          <ThemedText style={styles.label}>Climb?:</ThemedText>
           <CheckboxGroup
             options={climbOptions}
             selectedValues={[scoutingData.climbOptions].filter(Boolean)}
             onToggle={(option) => handleSingleSelect('climbOptions', option)}
           />
 
-          <ThemedText style={styles.label}>Auto Path:</ThemedText>
+          <ThemedText style={styles.label}>Describe the Auto Path:</ThemedText>
           <TextInput
             value={scoutingData.autoPath}
             onChangeText={(input) => setScoutingData({ ...scoutingData, autoPath: input })}
             style={styles.input}
           />
 
-          <ThemedText style={styles.label}>Auto Notes:</ThemedText>
+          <ThemedText style={styles.label}>Any Auto Notes?:</ThemedText>
           <TextInput
             value={scoutingData.autoNotes}
             onChangeText={(input) => setScoutingData({ ...scoutingData, autoNotes: input })}
@@ -224,12 +228,12 @@ export default function HomeScreen() {
             onToggle={(option) => handleSingleSelect('accuracyScale', parseInt(option))}
           />
 
-          <ThemedText style={styles.label}>Shooting Location:</ThemedText>
+          <ThemedText style={styles.label}>Shooting Location(s):</ThemedText>
           <TextInput
             placeholder="e.g., Against Hub, From Trench"
-            value={scoutingData.shootLocation || scoutingData.shootingLocation}
+            value={scoutingData.shootLocationTeleop || scoutingData.shootingLocationTeleop}
             onChangeText={(input) =>
-              setScoutingData({ ...scoutingData, shootLocation: input, shootingLocation: input })
+              setScoutingData({ ...scoutingData, shootLocationTeleop: input, shootingLocationTeleop: input })
             }
             style={styles.input}
           />
@@ -255,7 +259,7 @@ export default function HomeScreen() {
             onToggle={(option) => handleMultiSelect('intakeLocation', option)}
           />
 
-          <ThemedText style={styles.label}>Inactive Period:</ThemedText>
+          <ThemedText style={styles.label}>Describe their Inactive Period(s):</ThemedText>
           <TextInput
             value={scoutingData.inactivePeriod}
             onChangeText={(input) => setScoutingData({ ...scoutingData, inactivePeriod: input })}
@@ -265,7 +269,7 @@ export default function HomeScreen() {
         <ThemedText style={styles.titleContainer}>End Game</ThemedText>
 
             {/* END GAME */}
-          <ThemedText style={styles.label}>Actual Climb:</ThemedText>
+          <ThemedText style={styles.label}>Climb?:</ThemedText>
           <CheckboxGroup
             options={finalClimbOptions}
             selectedValues={[scoutingData.actualClimb].filter(Boolean)}
@@ -281,7 +285,7 @@ export default function HomeScreen() {
             onToggle={(option) => handleMultiSelect('typeOfRobot', option)}
           />
 
-          <ThemedText style={styles.label}>End Notes:</ThemedText>
+          <ThemedText style={styles.label}>Any Final Notes?:</ThemedText>
           <TextInput
             value={scoutingData.endNotes}
             onChangeText={(input) => setScoutingData({ ...scoutingData, endNotes: input })}
