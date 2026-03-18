@@ -55,13 +55,15 @@ export default function HomeScreen() {
     actualClimb: '',
     typeOfRobot: [],
     endNotes: '',
-    autoMortality: '',
-    underTrench: '',
-    overBump: '',
+    autoMortality: false,
+    teleopMortality: false,
+    underTrench: false,
+    overBump: false,
     climbOptions: '',
     autoPath: '',
     autoNotes: '',
     intakeLocations: [],
+    penaltyNotes: '',
   });
 
   const [submittedText, setSubmittedText] = useState('');
@@ -75,7 +77,7 @@ export default function HomeScreen() {
   const intakeLocationsOptions = ['Outpost', 'Depot', 'Neutral'];
   const typeOfRobotOptions = ['Defense', 'Shooter', 'Feeder'];
   const finalClimbOptions = ['No Climb', 'Level 1', 'Level 2', 'Level 3'];
-  const climbOptions = ['Level 1', 'Did not attempt climb', 'Attempted climb but failed'];
+  const climbOptions = ['Did Not Attempt', 'Attempted Climb but Failed', 'Climb Succesful'];
 
   // Handlers
   const handleSingleSelect = (field, value) => {
@@ -113,6 +115,7 @@ export default function HomeScreen() {
     'shooterScale',
     'accuracyScale',
     'shootingLocationTeleop',
+    'teleopMortality',
     'bump',
     'trench',
     'intakeLocation',
@@ -121,7 +124,8 @@ export default function HomeScreen() {
     // ENDGAME
     'actualClimb',
     'typeOfRobot',
-    'endNotes'
+    'penaltyNotes',
+    'endNotes',
   ]
 
   const handleSubmit = () => {
@@ -188,26 +192,26 @@ export default function HomeScreen() {
             onToggle={(option) => handleSingleSelect('startLocation', option)}
           />
 
-
-         <ThemedText style={styles.label}>Dead?:</ThemedText>
+          <ThemedText style={styles.label}>Dead?</ThemedText>
           <CheckboxGroup
-            options={yesNoOptions}
-            selectedValues={[scoutingData.autoMortality].filter(Boolean)}
-            onToggle={(option) => handleSingleSelect('autoMortality', option)}
+            options={['Yes']}
+            selectedValues={scoutingData.autoMortality ? ['Yes'] : []}
+            onToggle={() => setScoutingData({ ...scoutingData, autoMortality: !scoutingData.autoMortality })}
           />
+          
 
           <ThemedText style={styles.label}>Under Trench:</ThemedText>
           <CheckboxGroup
-            options={yesNoOptions}
-            selectedValues={[scoutingData.underTrench].filter(Boolean)}
-            onToggle={(option) => handleSingleSelect('underTrench', option)}
+            options={['Yes']}
+            selectedValues={scoutingData.underTrench ? ['Yes'] : []}
+            onToggle={() => setScoutingData({ ...scoutingData, underTrench: !scoutingData.underTrench })}
           />
 
           <ThemedText style={styles.label}>Over Bump:</ThemedText>
           <CheckboxGroup
-            options={yesNoOptions}
-            selectedValues={[scoutingData.overBump].filter(Boolean)}
-            onToggle={(option) => handleSingleSelect('overBump', option)}
+            options={['Yes']}
+            selectedValues={scoutingData.overBump ? ['Yes'] : []}
+            onToggle={() => setScoutingData({ ...scoutingData, overBump: !scoutingData.overBump })}
           />
         
         <ThemedText style={styles.label}>Intake:</ThemedText>
@@ -275,6 +279,13 @@ export default function HomeScreen() {
             style={styles.input}
           />
 
+        <ThemedText style={styles.label}>Dead?</ThemedText>
+          <CheckboxGroup
+            options={['Yes']}
+            selectedValues={scoutingData.teleopMortality ? ['Yes'] : []}
+            onToggle={() => setScoutingData({ ...scoutingData, teleopMortality: !scoutingData.teleopMortality })}
+          />
+          
           <ThemedText style={styles.label}>Bump:</ThemedText>
           <CheckboxGroup
             options={['Yes']}
@@ -321,6 +332,16 @@ export default function HomeScreen() {
             selectedValues={scoutingData.typeOfRobot}
             onToggle={(option) => handleMultiSelect('typeOfRobot', option)}
           />
+
+
+        <ThemedText style={styles.label}>Penalty?:</ThemedText>
+          <TextInput
+          placeholder='Indicate penalty points, reason for penalty'
+            value={scoutingData.penaltyNotes}
+            onChangeText={(input) => setScoutingData({ ...scoutingData, penaltyNotes: input })}
+            style={styles.input}
+          />
+
 
           <ThemedText style={styles.label}>Any Final Notes?:</ThemedText>
           <TextInput

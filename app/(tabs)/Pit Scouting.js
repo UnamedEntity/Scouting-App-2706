@@ -1,361 +1,267 @@
 import { Image } from 'expo-image';
 import { Button, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useState } from 'react';
+import QRCode from 'react-native-qrcode-svg';
 
 import ParallaxScrollView from '@/components/parallax-scroll-view';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { useState } from 'react';
-import QRCode from 'react-native-qrcode-svg';
 
 
-export default function pitScreen() { //function runs everytime something changes
-  //stores all the data from the intro screen
+// ✅ Reusable CheckboxGroup
+const CheckboxGroup = ({ options, selectedValues, onToggle }) => (
+  <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginVertical: 8 }}>
+    {options.map((option) => {
+      const isSelected = selectedValues.includes(option);
+
+      return (
+        <TouchableOpacity
+          key={option}
+          onPress={() => onToggle(option)}
+          style={{
+            paddingVertical: 8,
+            paddingHorizontal: 12,
+            borderWidth: 2,
+            borderColor: 'purple',
+            borderRadius: 8,
+            backgroundColor: isSelected ? 'purple' : 'white',
+          }}
+        >
+          <Text style={{ color: isSelected ? 'white' : 'black' }}>
+            {option}
+          </Text>
+        </TouchableOpacity>
+      );
+    })}
+  </View>
+);
+
+
+export default function PitScreen() {
+
   const [scoutingData, setScoutingData] = useState({
-    sizeOfHoppper: 0,
+    teamNumber: 0,
+    sizeOfHopper: 0,
     typeOfShooter: 0,
+    driveTrain: '',
     possibleClimbs: [],
+    possibleShootingLocations: [],
     travel: [],
     intake: [],
     pitNotes: '',
   });
 
-  const possibleClimbOptions = ['No Climb', 'Level 1', 'Level 2', 'Level 3'];
-  const travelOptions = ['Bump', 'Trench'];
-  const intakeOptions = ['Ground', 'Outpost'];
-  const [submittedText, setSubmittedText] = useState(''); // final data set
   const [submittedTextCSV, setSubmittedTextCSV] = useState('');
   const [showQRCSV, setShowQRCSV] = useState(false);
 
-  // Add this above your HomeScreen function
-const RadioGroup = ({ options, selected, onSelect }) => (
-  <View style={{ flexDirection: 'row', gap: 10, marginVertical: 8, flexWrap: 'wrap' }}>
-    {options.map((option) => (
-      <TouchableOpacity
-        key={option}
-        onPress={() => onSelect(option)}
-        style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}
-      >
-        <View style={{
-          width: 22,
-          height: 22,
-          borderRadius: 11,
-          borderWidth: 2,
-          borderColor: 'purple',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}>
-          {selected === option && (
-            <View style={{
-              width: 12,
-              height: 12,
-              borderRadius: 6,
-              backgroundColor: 'purple',
-            }} />
-          )}
-        </View>
-        <ThemedText style={{ color: '#000' }}>{option}</ThemedText>
-      </TouchableOpacity>
-    ))}
-  </View>
-);
+  // Options
+  const possibleClimbOptions = ['No Climb', 'Level 1', 'Level 2', 'Level 3'];
+  const travelOptions = ['Bump', 'Trench'];
+  const intakeOptions = ['Ground', 'Outpost'];
+  const shootingOptions = [
+    'Against Hub',
+    'From Trench',
+    'From Corners',
+    'Against Tower',
+    'Anywhere in alliance zone'
+  ];
 
-const toggleIntakeLocation = (option) => {
-  const current = scoutingData.intakeLocations;
-  const updated = current.includes(option)
-    ? current.filter(item => item !== option)  // remove if already selected
-    : [...current, option];                     // add if not selected
-  setScoutingData({ ...scoutingData, intakeLocations: updated });
-};
+  // Handlers
+  const handleMultiSelect = (field, value) => {
+    const current = scoutingData[field];
+    const updated = current.includes(value)
+      ? current.filter((item) => item !== value)
+      : [...current, value];
+
+    setScoutingData({ ...scoutingData, [field]: updated });
+  };
+
+  // CSV ORDER
+  const fieldOrder = [
+    'teamNumber',
+    'sizeOfHopper',
+    'typeOfShooter',
+    'driveTrain',
+    'possibleClimbs',
+    'possibleShootingLocations',
+    'travel',
+    'intake',
+    'pitNotes',
+  ];
 
   const handleSubmit = () => {
+    const values = fieldOrder.map((key) => {
+      const value = scoutingData[key];
+      return Array.isArray(value) ? value.join('|') : value;
+    });
 
-    setSubmittedText(JSON.stringify(scoutingData));
+    const csv = values.join(',');
 
-    // takes out all the values from scoutingData and joins them with commas to create a csv string
-    const values = Object.values(scoutingData);
-    const csv = values.join(","); // converts scoutingData to csv format, for example: "John Doe,1,1234,Left"
-
-    setSubmittedTextCSV(csv); // sets the csv string to submittedTextCSV, which is used to generate the QR code
-
-    setShowQRCSV(true); // shows the QR code, which is hidden by default, after the submit button is pressed
+    setSubmittedTextCSV(csv);
+    setShowQRCSV(true);
   };
-  
-
 
   return (
-    
-   <ParallaxScrollView
-   
-  headerBackgroundColor={{ dark: '#663399' }}
-  headerHeight={300} // controls the scrollable header height
-  headerImage={
-    <Image
-      source={require('../images/mergelogo.jpg')}
-      style={{
-        width: '100%',           // full width of the screen
-        aspectRatio: 1.5,        // adjust to your image's width/height ratio
-        resizeMode: 'contain',   // keeps entire image visible
-      }}
-    />
-  }
->
-    <SafeAreaView style={{flex: 1, backgroundColor: '#fff'}}>
+    <ParallaxScrollView
+      headerBackgroundColor={{ dark: '#663399' }}
+      headerHeight={300}
+      headerImage={
+        <Image
+          source={require('../images/mergelogo.jpg')}
+          style={{
+            width: '100%',
+            aspectRatio: 1.5,
+            resizeMode: 'contain',
+          }}
+        />
+      }
+    >
+      <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
 
-      <ThemedView style={styles.stepContainer}>
-        
-        <ThemedText style={styles.titleContainer}>Pit Scouting</ThemedText>
-        
-        <ThemedText style={{ color: '#000' }}>Size of Hopper (# of fuel):</ThemedText>
-        <TextInput value={scoutingData.sizeOfHopper} 
-                  // changes string input to int, if input is empty or not a number, sets matchNumber to 0
-                  onChangeText={(input) =>
-                  setScoutingData({ ...scoutingData, sizeOfHopper: parseInt(input) || 0 })}
-                  style={{ height: 50, borderColor: 'purple', borderWidth: 2}} />
-        
-        <ThemedText style={{ color: '#000' }}>Type of Shooter (1 for single, 2 for dual, 3 for triple):</ThemedText>
-        <TextInput value={scoutingData.typeOfShooter} 
-                  // changes string input to int, if input is empty or not a number, sets matchNumber to 0
-                  onChangeText={(input) =>
-                  setScoutingData({ ...scoutingData, typeOfShooter: parseInt(input) || 0 })}
-                  style={{ height: 50, borderColor: 'purple', borderWidth: 2}} />
+        <ThemedView style={styles.stepContainer}>
+          <ThemedText style={styles.title}>Pit Scouting</ThemedText>
 
-          <ThemedText style={{ color: '#000' }}>Climb:</ThemedText>
+          {/* TEAM NUMBER */}
+          <ThemedText style={styles.label}>Team Number:</ThemedText>
+          <TextInput
+            keyboardType="numeric"
+            value={scoutingData.teamNumber.toString()}
+            onChangeText={(input) =>
+              setScoutingData({ ...scoutingData, teamNumber: parseInt(input) || 0 })
+            }
+            style={styles.input}
+          />
 
-              <View style={{ flexDirection: 'row', gap: 10, marginVertical: 8 }}>
-                  {possibleClimbOptions.map((option) => (
-                    <TouchableOpacity
-                      key={option}
-                      onPress={() => {
-                        const selected = scoutingData.possibleClimbs;
+          {/* HOPPER */}
+          <ThemedText style={styles.label}>Size of Hopper (# of fuel it can hold):</ThemedText>
+          <TextInput
+            keyboardType="numeric"
+            value={scoutingData.sizeOfHopper.toString()}
+            onChangeText={(input) =>
+              setScoutingData({ ...scoutingData, sizeOfHopper: parseInt(input) || 0 })
+            }
+            style={styles.input}
+          />
 
-                        if (selected.includes(option)) {
-                          setScoutingData({
-                            ...scoutingData,
-                            possibleClimbs: selected.filter((item) => item !== option),
-                          });
-                        } else {
-                          setScoutingData({
-                            ...scoutingData,
-                            possibleClimbs: [...selected, option],
-                          });
-                        }
-                      }}
-                      style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        gap: 6,
-                      }}
-                    >
-                      {/* Outer circle */}
-                      <View
-                        style={{
-                          width: 22,
-                          height: 22,
-                          borderWidth: 2,
-                          borderColor: 'purple',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                        }}
-                      >
-                        {/* Filled circle if selected */}
-                        {scoutingData.possibleClimbs.includes(option) && (
-                          <View
-                            style={{
-                              width: 12,
-                              height: 12,
-                              backgroundColor: 'purple',
-                            }}
-                          />
-                        )}
-                      </View>
+          {/* SHOOTER */}
+          <ThemedText style={styles.label}>Type of Shooter (1 for single, 2 for dual, etc.):</ThemedText>
+          <TextInput
+            keyboardType="numeric"
+            value={scoutingData.typeOfShooter.toString()}
+            onChangeText={(input) =>
+              setScoutingData({ ...scoutingData, typeOfShooter: parseInt(input) || 0 })
+            }
+            style={styles.input}
+          />
 
-                      <ThemedText style={{ color: '#000' }}>{option}</ThemedText>
-                    </TouchableOpacity>
-                  ))}
-                </View>
+          {/* DRIVETRAIN */}
+          <ThemedText style={styles.label}>Drivetrain:</ThemedText>
+          <TextInput
+            placeholder="e.g. Swerve, Tank"
+            value={scoutingData.driveTrain}
+            onChangeText={(input) =>
+              setScoutingData({ ...scoutingData, driveTrain: input })
+            }
+            style={styles.input}
+          />
 
+          {/* CLIMB */}
+          <ThemedText style={styles.label}>Climb:</ThemedText>
+          <CheckboxGroup
+            options={possibleClimbOptions}
+            selectedValues={scoutingData.possibleClimbs}
+            onToggle={(option) => handleMultiSelect('possibleClimbs', option)}
+          />
 
-          <ThemedText style={{ color: '#000' }}>Travel:</ThemedText>
+          {/* SHOOTING */}
+          <ThemedText style={styles.label}>Shooting Locations:</ThemedText>
+          <CheckboxGroup
+            options={shootingOptions}
+            selectedValues={scoutingData.possibleShootingLocations}
+            onToggle={(option) => handleMultiSelect('possibleShootingLocations', option)}
+          />
 
-          <View style={{ flexDirection: 'row', gap: 10, marginVertical: 8 }}>
-                  {travelOptions.map((option) => (
-                    <TouchableOpacity
-                      key={option}
-                      onPress={() => {
-                        const selected = scoutingData.travel;
+          {/* TRAVEL */}
+          <ThemedText style={styles.label}>Travel:</ThemedText>
+          <CheckboxGroup
+            options={travelOptions}
+            selectedValues={scoutingData.travel}
+            onToggle={(option) => handleMultiSelect('travel', option)}
+          />
 
-                        if (selected.includes(option)) {
-                          setScoutingData({
-                            ...scoutingData,
-                            travel: selected.filter((item) => item !== option),
-                          });
-                        } else {
-                          setScoutingData({
-                            ...scoutingData,
-                            travel: [...selected, option],
-                          });
-                        }
-                      }}
-                      style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        gap: 6,
-                      }}
-                    >
-                      {/* Outer circle */}
-                      <View
-                        style={{
-                          width: 22,
-                          height: 22,
-                          borderWidth: 2,
-                          borderColor: 'purple',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                        }}
-                      >
-                        {/* Filled circle if selected */}
-                        {scoutingData.travel.includes(option) && (
-                          <View
-                            style={{
-                              width: 12,
-                              height: 12,
-                              backgroundColor: 'purple',
-                            }}
-                          />
-                        )}
-                      </View>
+          {/* INTAKE */}
+          <ThemedText style={styles.label}>Intake:</ThemedText>
+          <CheckboxGroup
+            options={intakeOptions}
+            selectedValues={scoutingData.intake}
+            onToggle={(option) => handleMultiSelect('intake', option)}
+          />
 
-                      <ThemedText style={{ color: '#000' }}>{option}</ThemedText>
-                    </TouchableOpacity>
-                  ))}
-                </View>
+          {/* NOTES */}
+          <ThemedText style={styles.label}>Notes:</ThemedText>
+          <TextInput
+            value={scoutingData.pitNotes}
+            onChangeText={(input) =>
+              setScoutingData({ ...scoutingData, pitNotes: input })
+            }
+            style={styles.input}
+          />
 
+          {/* SUBMIT */}
+          <Button title="Submit" color="purple" onPress={handleSubmit} />
 
-              <ThemedText style={{ color: '#000' }}>Intake:</ThemedText>
+          {/* QR */}
+          {showQRCSV && submittedTextCSV !== '' && (
+            <View style={styles.qrContainer}>
+              <ThemedText style={{ color: '#000', marginBottom: 10 }}>
+                Scan to Export CSV
+              </ThemedText>
+              <QRCode value={submittedTextCSV} size={300} />
+            </View>
+          )}
 
-                <View style={{ flexDirection: 'row', gap: 10, marginVertical: 8 }}>
-                  {intakeOptions.map((option) => (
-                    <TouchableOpacity
-                      key={option}
-                      onPress={() => {
-                        const selected = scoutingData.intake;
+          <Text style={{ marginTop: 20, color: '#000' }}>
+            {submittedTextCSV}
+          </Text>
 
-                        if (selected.includes(option)) {
-                          setScoutingData({
-                            ...scoutingData,
-                            intake: selected.filter((item) => item !== option),
-                          });
-                        } else {
-                          setScoutingData({
-                            ...scoutingData,
-                            intake: [...selected, option],
-                          });
-                        }
-                      }}
-                      style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        gap: 6,
-                      }}
-                    >
-                      {/* Outer circle */}
-                      <View
-                        style={{
-                          width: 22,
-                          height: 22,
-                          borderWidth: 2,
-                          borderColor: 'purple',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                        }}
-                      >
-                        {/* Filled circle if selected */}
-                        {scoutingData.intake.includes(option) && (
-                          <View
-                            style={{
-                              width: 14,
-                              height: 14,
-                              backgroundColor: 'purple',
-                            }}
-                          />
-                        )}
-                      </View>
+        </ThemedView>
 
-                      <ThemedText style={{ color: '#000' }}>{option}</ThemedText>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-
-
-        <ThemedText style={{ color: '#000' }}>Notes:</ThemedText>
-                <TextInput value={scoutingData.pitNotes} 
-                  onChangeText={(input) =>
-                  setScoutingData({ ...scoutingData, pitNotes: input })
-                  } 
-                  style={{ height: 50, borderColor: 'purple', borderWidth: 2}} />
-
-        
-        
-
-      </ThemedView>
-       <Button title="Submit" onPress={handleSubmit} />
-        {/* prints submittedText */}
-        <Text style={{ marginTop: 20, color: '#000' }}>You submitted: {submittedText} </Text>
-
-  {showQRCSV && submittedTextCSV !== '' && (
-  
-  <View style={styles.qrContainer}>
-    <ThemedText style={{color: '#000', marginBottom: 10}}>For Scanner:</ThemedText>
-    <QRCode 
-      value={submittedTextCSV}  // only one value prop
-      size={400}                // only one size prop
-      color="black"
-      backgroundColor="white"
-    />
-  </View>)}
-
-    </SafeAreaView>
+      </SafeAreaView>
     </ParallaxScrollView>
   );
 }
 
-
-
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    color: '#000',
-    fontSize: 24,
-    marginBottom: 20,
-    textDecorationLine: 'underline',
-    fontWeight: 'bold',
-  },
   stepContainer: {
-    gap: 8,
-    marginBottom: 100,
-    backgroundColor: '#ffffff',
-    color: '#000000',
+    padding: 20,
+    gap: 12,
+    backgroundColor: '#fff',
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  input: {
+    height: 50,
+    borderColor: 'purple',
+    borderWidth: 2,
+    borderRadius: 8,
+    paddingHorizontal: 10,
   },
-
-  container:{
-    flex:1,
+  label: {
+    fontWeight: 'bold',
+    color: '#000',
+    marginTop: 10,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    textDecorationLine: 'underline',
+    marginBottom: 20,
+    color: '#000',
+  },
+  qrContainer: {
     alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#ffffff',
-  }
+    marginTop: 20,
+    padding: 15,
+    backgroundColor: '#F9F9F9',
+    borderRadius: 15,
+  },
 });
-
-
-
-
-
