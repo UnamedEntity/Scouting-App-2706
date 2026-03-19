@@ -76,7 +76,7 @@ export default function HomeScreen() {
   const intakeOptions = ['Ground', 'Outpost'];
   const intakeLocationsOptions = ['Outpost', 'Depot', 'Neutral'];
   const typeOfRobotOptions = ['Defense', 'Shooter', 'Feeder'];
-  const finalClimbOptions = ['No Climb', 'Level 1', 'Level 2', 'Level 3'];
+  const finalClimbOptions = ['No Climb', 'Attempted Climb but Failed', 'Level 1', 'Level 2', 'Level 3'];
   const climbOptions = ['Did Not Attempt', 'Attempted Climb but Failed', 'Climb Succesful'];
 
   // Handlers
@@ -128,13 +128,30 @@ export default function HomeScreen() {
     'endNotes',
   ]
 
+  const escapeCSV = (value) => {
+  if (value === null || value === undefined) return '';
+
+  let stringValue = String(value);
+
+  // Escape double quotes by doubling them
+  stringValue = stringValue.replace(/"/g, '""');
+
+  // Wrap in quotes if it contains comma, newline, or quotes
+  if (/[",\n]/.test(stringValue)) {
+    stringValue = `"${stringValue}"`;
+  }
+
+  return stringValue;
+};
+
+
   const handleSubmit = () => {
     setSubmittedText(JSON.stringify(scoutingData));
 
     const values = fieldOrder.map((key) => {
-      const value = scoutingData[key];
-      return Array.isArray(value) ? value.join('|') : value;
-    });
+  const value = scoutingData[key];
+  const processed = Array.isArray(value) ? value.join('|') : value;
+  return escapeCSV(processed);});
 
     const csv = values.join(',');
 
@@ -240,6 +257,7 @@ export default function HomeScreen() {
 
           <ThemedText style={styles.label}>Describe the Auto Path:</ThemedText>
           <TextInput
+            placeholder='eg. shot 8 fuel, intook from alliance zone'
             value={scoutingData.autoPath}
             onChangeText={(input) => setScoutingData({ ...scoutingData, autoPath: input })}
             style={styles.input}
@@ -247,6 +265,7 @@ export default function HomeScreen() {
 
           <ThemedText style={styles.label}>Any Auto Notes?:</ThemedText>
           <TextInput
+            placeholder='eg. shooter was inaccurate'
             value={scoutingData.autoNotes}
             onChangeText={(input) => setScoutingData({ ...scoutingData, autoNotes: input })}
             style={styles.input}
@@ -309,6 +328,7 @@ export default function HomeScreen() {
 
           <ThemedText style={styles.label}>Describe their Inactive Period(s):</ThemedText>
           <TextInput
+            placeholder='eg. feeding fuel to alliance zone, defense'
             value={scoutingData.inactivePeriod}
             onChangeText={(input) => setScoutingData({ ...scoutingData, inactivePeriod: input })}
             style={styles.input}
@@ -345,6 +365,7 @@ export default function HomeScreen() {
 
           <ThemedText style={styles.label}>Any Final Notes?:</ThemedText>
           <TextInput
+            placeholder='eg. robot was very slow, but climbed well'
             value={scoutingData.endNotes}
             onChangeText={(input) => setScoutingData({ ...scoutingData, endNotes: input })}
             style={styles.input}
