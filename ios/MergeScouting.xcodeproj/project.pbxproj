@@ -21,7 +21,7 @@
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = MergeScouting/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = MergeScouting/Info.plist; sourceTree = "<group>"; };
 		152F430AF06D451A51CB46C0 /* libPods-MergeScouting.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-MergeScouting.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		1A10BB3E6FC4BD5DA65A62F4 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = MergeScouting/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		1A10BB3E6FC4BD5DA65A62F4 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = MergeScouting/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		6035321F887178472FFEAEA4 /* Pods-MergeScouting.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MergeScouting.release.xcconfig"; path = "Target Support Files/Pods-MergeScouting/Pods-MergeScouting.release.xcconfig"; sourceTree = "<group>"; };
 		6E215DC50F824EBE2DDE0E61 /* Pods-MergeScouting.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MergeScouting.debug.xcconfig"; path = "Target Support Files/Pods-MergeScouting/Pods-MergeScouting.debug.xcconfig"; sourceTree = "<group>"; };
 		757864927E4686D216024081 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-MergeScouting/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
@@ -73,7 +73,6 @@
 				6E215DC50F824EBE2DDE0E61 /* Pods-MergeScouting.debug.xcconfig */,
 				6035321F887178472FFEAEA4 /* Pods-MergeScouting.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -258,6 +257,8 @@
 				"${PODS_CONFIGURATION_BUILD_DIR}/React-Core/React-Core_privacy.bundle",
 				"${PODS_CONFIGURATION_BUILD_DIR}/React-cxxreact/React-cxxreact_privacy.bundle",
 				"${PODS_CONFIGURATION_BUILD_DIR}/SDWebImage/SDWebImage.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/expo-dev-launcher/EXDevLauncher.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/expo-dev-menu/EXDevMenu.bundle",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (
@@ -270,6 +271,8 @@
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/React-Core_privacy.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/React-cxxreact_privacy.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/SDWebImage.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/EXDevLauncher.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/EXDevMenu.bundle",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -345,6 +348,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = MergeScouting/MergeScouting.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 8BK46KQ2XT;
 				ENABLE_BITCODE = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
@@ -363,7 +367,7 @@
 					"-lc++",
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
-				PRODUCT_BUNDLE_IDENTIFIER = com.papaya0.MergeScouting;
+				PRODUCT_BUNDLE_IDENTIFIER = com.klrc.mergescouting;
 				PRODUCT_NAME = MergeScouting;
 				SWIFT_OBJC_BRIDGING_HEADER = "MergeScouting/MergeScouting-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -381,6 +385,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = MergeScouting/MergeScouting.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 8BK46KQ2XT;
 				INFOPLIST_FILE = MergeScouting/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -394,7 +399,7 @@
 					"-lc++",
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
-				PRODUCT_BUNDLE_IDENTIFIER = com.papaya0.MergeScouting;
+				PRODUCT_BUNDLE_IDENTIFIER = com.klrc.mergescouting;
 				PRODUCT_NAME = MergeScouting;
 				SWIFT_OBJC_BRIDGING_HEADER = "MergeScouting/MergeScouting-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
