@@ -2,6 +2,8 @@ import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
+import { useEffect } from 'react';
+
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
@@ -10,6 +12,12 @@ export const unstable_settings = {
 };
 
 export default function RootLayout() {
+    useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js');
+    }
+  }, []);
+
   const colorScheme = useColorScheme();
 
   return (
