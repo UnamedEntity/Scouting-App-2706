@@ -29,7 +29,10 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/favicon.png",
+      "build": {
+        "publicPath": "https://anishaj44.github.io/Scouting-App-2706/"
+      }
     },
     "plugins": [
       "expo-router",
@@ -42,6 +45,7 @@
           "backgroundColor": "#ffffff",
           "dark": {
             "backgroundColor": "#000000"
+          
           }
         }
       ]
