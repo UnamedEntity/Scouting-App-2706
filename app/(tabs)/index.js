@@ -38,7 +38,6 @@ const CheckboxGroup = ({ options, selectedValues, onToggle }) => (
 );
 
 export default function HomeScreen() {
-  <BrowerRouter basename="/Scouting-App-2706/"></BrowerRouter>
   if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/service-worker.js');
   }
