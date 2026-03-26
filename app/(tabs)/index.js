@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { Button, SafeAreaView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 
-
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwkJGBdm3BQ5sQARWlTtl163dhWTFp2mvbd9HamE3NCfZWQZQqce9lLrAdsKUiRH4S-/exec"
 
 // Reusable CheckboxGroup
 const CheckboxGroup = ({ options, selectedValues, onToggle }) => (
@@ -38,9 +38,9 @@ const CheckboxGroup = ({ options, selectedValues, onToggle }) => (
 );
 
 export default function HomeScreen() {
-  if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/service-worker.js');
-  }
+  // if ('serviceWorker' in navigator) {
+  // navigator.serviceWorker.register('/service-worker.js');
+  // }
 
   const [scoutingData, setScoutingData] = useState({
     // First program fields
@@ -149,10 +149,28 @@ export default function HomeScreen() {
 };
 
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     setSubmittedText(JSON.stringify(scoutingData));
 
-    const values = fieldOrder.map((key) => {
+    try {
+    const response = await fetch(GOOGLE_SCRIPT_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "text/plain",
+      },
+      body: JSON.stringify(scoutingData),
+    });
+
+    const result = await response.json();
+
+    if (result.status === "success") {
+      console.log("Submitted!");
+    }
+  } catch (error) {
+    console.error("Submission failed:", error);
+  }
+
+  const values = fieldOrder.map((key) => {
   const value = scoutingData[key];
   const processed = Array.isArray(value) ? value.join('|') : value;
   return escapeCSV(processed);});
