@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Text, View, Button, StyleSheet, ScrollView, Platform } from "react-native";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import * as FileSystem from 'expo-file-system/legacy';
@@ -23,72 +23,27 @@ export default function Scanner() {
     );
   }
 
-  // null on web — prevents FileSystem.documentDirectory from being evaluated
   const path = Platform.OS !== 'web' ? FileSystem.documentDirectory + 'scanned_data.csv' : null;
 
   async function writeCSV(data) {
     const row = data + '\n';
-
     if (Platform.OS === 'web') {
       setCsvContent(prev => prev + row);
       return;
     }
-
-  if (fileInfo.exists) {
-    // read existing file
-    const existing = await FileSystem.readAsStringAsync(path, { encoding: 'utf8' });
-
-    // write back with new row appended
-    await FileSystem.writeAsStringAsync(path, existing + row, { encoding: 'utf8' });
-  } else {
-    // create file with first row
-    await FileSystem.writeAsStringAsync(path, row, { encoding: 'utf8' });
-  }
-}
-
-async function readCSV() {
-  const content = await FileSystem.readAsStringAsync(path, { encoding: 'utf8' });
-  setCsvContent(content);
-}
-
-async function exportCSV() {
-  const fileInfo = await FileSystem.getInfoAsync(path);
-  if (!fileInfo.exists) {
-    alert("No data to export yet.");
-    return;
+    const fileInfo = await FileSystem.getInfoAsync(path);
+    if (fileInfo.exists) {
+      const existing = await FileSystem.readAsStringAsync(path, { encoding: 'utf8' });
+      await FileSystem.writeAsStringAsync(path, existing + row, { encoding: 'utf8' });
+    } else {
+      await FileSystem.writeAsStringAsync(path, row, { encoding: 'utf8' });
+    }
   }
 
-  const content = await FileSystem.readAsStringAsync(path, { encoding: 'utf8' });
-
-  if (Platform.OS === 'web') {
-    // Browser download — creates a temporary link and clicks it
-    const blob = new Blob([content], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'scanned_data.csv';
-    a.click();
-    URL.revokeObjectURL(url); // clean up
-    return;
-  }
-
-  // Android / iOS fallback (your existing logic)
-  if (Platform.OS === 'android') {
-    // ... your android code
-  } else {
-    await Sharing.shareAsync(path, {
-      mimeType: 'text/csv',
-      dialogTitle: 'Save CSV File',
-      UTI: 'public.comma-separated-values-text',
-    });
-  }
-}
-
-async function clearCSV() {
-  const fileInfo = await FileSystem.getInfoAsync(path);
-
-  if (fileInfo.exists) {
-    await FileSystem.writeAsStringAsync(path, "", { encoding: "utf8" });
+  async function readCSV() {
+    if (Platform.OS === 'web') return;
+    const content = await FileSystem.readAsStringAsync(path, { encoding: 'utf8' });
+    setCsvContent(content);
   }
 
   async function exportCSV() {
@@ -106,13 +61,11 @@ async function clearCSV() {
       URL.revokeObjectURL(url);
       return;
     }
-
     const fileInfo = await FileSystem.getInfoAsync(path);
     if (!fileInfo.exists) {
       alert("No data to export yet.");
       return;
     }
-
     if (Platform.OS === 'android') {
       const permissions = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
       if (!permissions.granted) {
@@ -147,7 +100,6 @@ async function clearCSV() {
       setScannedData("");
       return;
     }
-
     const fileInfo = await FileSystem.getInfoAsync(path);
     if (fileInfo.exists) {
       await FileSystem.writeAsStringAsync(path, "", { encoding: "utf8" });
@@ -171,13 +123,9 @@ async function clearCSV() {
         onBarcodeScanned={scanned ? undefined : handleBarcodeScanned}
         barcodeScannerSettings={{ barcodeTypes: ["qr"] }}
       />
-
       <ScrollView
         style={{ flex: 1 }}
-        contentContainerStyle={{
-          justifyContent: "center",
-          alignItems: "center"
-        }}
+        contentContainerStyle={{ justifyContent: "center", alignItems: "center" }}
       >
         <Text style={styles.text}>Scanned Data:</Text>
         <Text style={styles.data}>{scannedData}</Text>
@@ -201,26 +149,14 @@ async function clearCSV() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  camera: {
-    flex: 3,
-  },
+  container: { flex: 1 },
+  camera: { flex: 3 },
   resultContainer: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
     padding: 20,
   },
-  text: {
-    fontSize: 20,
-    marginBottom: 10,
-    color: '#ffffff',
-  },
-  data: {
-    fontSize: 16,
-    marginBottom: 20,
-    color: '#ffffff',
-  },
+  text: { fontSize: 20, marginBottom: 10, color: '#ffffff' },
+  data: { fontSize: 16, marginBottom: 20, color: '#ffffff' },
 });
