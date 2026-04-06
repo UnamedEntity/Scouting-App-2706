@@ -1,14 +1,3 @@
-/**
- * Optional: append one row using Google Sheets API v4 + service account (Node.js only).
- * Not used by the Expo app — run locally or on a server.
- *
- * Setup:
- *   1. Google Cloud: enable Sheets API, create a service account, share the spreadsheet with the SA email (Editor).
- *   2. Save JSON key path in GOOGLE_APPLICATION_CREDENTIALS
- *   npm run sheets:append
- *
- * Env: GOOGLE_APPLICATION_CREDENTIALS, GOOGLE_SPREADSHEET_ID (optional; defaults in script)
- */
 
 import { google } from 'googleapis';
 import { readFileSync } from 'fs';
