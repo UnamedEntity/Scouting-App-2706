@@ -1,20 +1,20 @@
 import { Tabs } from 'expo-router';
-import React from 'react';
+import { useEffect } from 'react';
+import { Platform } from 'react-native';
 
 import { HapticTab } from '@/components/haptic-tab';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { useEffect } from 'react';
-
 
 export default function TabLayout() {
-useEffect(() => {
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/Scouting-App-2706/service-worker.js', {
-        scope: '/Scouting-App-2706/'
-      });
-    }
+  // Dev server does not serve these paths; only register after static export (e.g. GitHub Pages).
+  useEffect(() => {
+    if (Platform.OS !== 'web' || __DEV__) return;
+    if (typeof navigator === 'undefined' || !('serviceWorker' in navigator)) return;
+    navigator.serviceWorker
+      .register('/Scouting-App-2706/service-worker.js', { scope: '/Scouting-App-2706/' })
+      .catch(() => {});
   }, []);
 
   const colorScheme = useColorScheme();
@@ -34,10 +34,17 @@ useEffect(() => {
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="scanner"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          title: 'Scanner',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="qrcode.viewfinder" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="Pit-Scouting"
+        options={{
+          title: 'Pit',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="wrench.and.screwdriver.fill" color={color} />,
         }}
       />
     </Tabs>

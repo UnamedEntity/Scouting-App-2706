@@ -57,6 +57,9 @@
     },
     "extra": {
       "router": {},
+      "googleScriptUrl": "https://script.google.com/macros/s/AKfycbwooDbUxSg96vLW-bwJAqm7PfCtzyXDu2oCw5ep1NcSQ-VISzV2b3OIUg80jjgz2DFIxw/exec",
+      "googleSpreadsheetId": "1hpkMLCCJxAUx3pXpzewEySK9NprdBFKytyecFG-yW9w",
+      "googleMatchSheetName": "Sheet1",
       "eas": {
         "projectId": "08da1bd5-40fb-4911-abf6-b2bd6fc2fb15"
       }

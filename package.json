@@ -5,11 +5,14 @@
   "homepage": "https://anishaj44.github.io/Scouting-App-2706/",
 
   "scripts": {
+    "sheets:append": "node scripts/sheets-append-node.mjs",
     "start": "expo start",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
+    "web:8082": "expo start --web --port 8082",
+    "build:web": "expo export -p web",
     "lint": "expo lint"
   },
   "dependencies": {
@@ -52,6 +55,7 @@
     "react-native-worklets": "0.5.1"
   },
   "devDependencies": {
+    "googleapis": "^159.0.0",
     "@react-native-community/cli": "latest",
     "@types/react": "~19.1.0",
     "eslint": "^9.25.0",
