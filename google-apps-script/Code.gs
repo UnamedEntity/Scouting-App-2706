@@ -1,8 +1,4 @@
-/**
- * Deploy as Web app: Execute as "Me", Who has access: "Anyone" (or your team).
- * Replace SPREADSHEET_ID with your sheet if not sent by the client.
- * Enable: Extensions → Apps Script
- */
+
 const DEFAULT_SPREADSHEET_ID = '1hpkMLCCJxAUx3pXpzewEySK9NprdBFKytyecFG-yW9w';
 const DEFAULT_SHEET_NAME = 'Sheet1';
 
