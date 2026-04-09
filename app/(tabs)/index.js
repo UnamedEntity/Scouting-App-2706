@@ -2,11 +2,9 @@ import ParallaxScrollView from '@/components/parallax-scroll-view';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Image } from 'expo-image';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button, SafeAreaView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
-
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwkJGBdm3BQ5sQARWlTtl163dhWTFp2mvbd9HamE3NCfZWQZQqce9lLrAdsKUiRH4S-/exec"
 
 // Reusable CheckboxGroup
 const CheckboxGroup = ({ options, selectedValues, onToggle }) => (
@@ -38,14 +36,15 @@ const CheckboxGroup = ({ options, selectedValues, onToggle }) => (
 );
 
 export default function HomeScreen() {
-  // if ('serviceWorker' in navigator) {
-  // navigator.serviceWorker.register('/service-worker.js');
-  // }
+
+
 
   const [scoutingData, setScoutingData] = useState({
     // First program fields
     nameOfScout: '',
     matchNumber: 0,
+    alliance: [],
+    position: [],
     teamNumber: 0,
     startLocation: '',
     shooterScale: 1,
@@ -72,12 +71,37 @@ export default function HomeScreen() {
     penaltyNotes: '',
   });
 
+  useEffect(() => {
+  const fetchTeam = async () => {
+    if (!scoutingData.matchNumber || !scoutingData.alliance.length || !scoutingData.position.length) return;
+
+    const eventKey = '2026onto'; // ← change this to your event key
+    const res = await fetch(`https://www.thebluealliance.com/api/v3/event/${eventKey}/matches`, {
+      headers: { 'X-TBA-Auth-Key': process.env.EXPO_PUBLIC_TBA_API_KEY }
+    });
+    const matches = await res.json();
+
+    const match = matches.find(m => m.match_number === scoutingData.matchNumber && m.comp_level === 'qm');
+    if (!match) return;
+
+    const alliance = scoutingData.alliance[0].toLowerCase();
+    const positionIndex = parseInt(scoutingData.position[0]) - 1;
+    const teamKey = match.alliances[alliance].team_keys[positionIndex];
+    const teamNumber = parseInt(teamKey.replace('frc', ''));
+
+    setScoutingData(prev => ({ ...prev, teamNumber }));
+  };
+
+  fetchTeam();
+}, [scoutingData.matchNumber, scoutingData.alliance, scoutingData.position]);
+
   const [submittedText, setSubmittedText] = useState('');
   const [submittedTextCSV, setSubmittedTextCSV] = useState('');
   const [showQRCSV, setShowQRCSV] = useState(false);
 
   // Options
-  const yesNoOptions = ['Yes', 'No'];
+  const allianceOptions = ['Red', 'Blue'];
+  const positionOptions = ['1', '2', '3'];
   const startLocationOptions = ['At Hub', 'Depot Side Trench', 'Outpost Side Trench', 'Depot Side Bump', 'Outpost Side Bump'];
   const intakeOptions = ['Ground', 'Outpost'];
   const intakeLocationsOptions = ['Outpost', 'Depot', 'Neutral'];
@@ -154,7 +178,6 @@ export default function HomeScreen() {
 
   const handleClear = () => {
     setScoutingData({
-      nameOfScout: '',
       matchNumber: 0,
       teamNumber: 0,
       startLocation: '',
@@ -245,13 +268,26 @@ export default function HomeScreen() {
             style={styles.input}
           />
 
+          <ThemedText style={styles.label}>Alliance:</ThemedText>
+          <CheckboxGroup
+            options={allianceOptions}
+            selectedValues={scoutingData.alliance}
+            onToggle={(option) => handleMultiSelect('alliance', option)}
+          />
+
+          <ThemedText style={styles.label}>Position:</ThemedText>
+          <CheckboxGroup
+            options={positionOptions}
+            selectedValues={scoutingData.position}
+            onToggle={(option) => handleMultiSelect('position', option)}
+          />
+
           <ThemedText style={styles.label}>Team Number:</ThemedText>
           <TextInput
-            keyboardType="numeric"
-            value={scoutingData.teamNumber.toString()}
-            onChangeText={(input) => setScoutingData({ ...scoutingData, teamNumber: parseInt(input) || 0 })}
-            style={styles.input}
-          />
+              value={scoutingData.teamNumber.toString()}
+              editable={false}
+              style={[styles.input, { backgroundColor: '#f0f0f0' }]}
+            />
 
           <Image source={require('../images/frc2026rebuiltmap.png')} style={{ width: '100%', height: 200, resizeMode: 'contain' }} />
 
