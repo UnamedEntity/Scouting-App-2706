@@ -274,14 +274,14 @@ export default function HomeScreen() {
           <CheckboxGroup
             options={allianceOptions}
             selectedValues={scoutingData.alliance}
-            onToggle={(option) => handleMultiSelect('alliance', option)}
+            onToggle={(option) => handleSingleSelect('alliance', option)}
           />
 
           <ThemedText style={styles.label}>Position:</ThemedText>
           <CheckboxGroup
             options={positionOptions}
             selectedValues={scoutingData.position}
-            onToggle={(option) => handleMultiSelect('position', option)}
+            onToggle={(option) => handleSingleSelect('position', option)}
           />
 
           <ThemedText style={styles.label}>Team Number:</ThemedText>
