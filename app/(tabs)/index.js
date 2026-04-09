@@ -75,7 +75,7 @@ export default function HomeScreen() {
   const fetchTeam = async () => {
     if (!scoutingData.matchNumber || !scoutingData.alliance.length || !scoutingData.position.length) return;
 
-    const eventKey = '2026onto'; // ← change this to your event key
+    const eventKey = '2024nyny'; // ← change this to your event key
     const res = await fetch(`https://www.thebluealliance.com/api/v3/event/${eventKey}/matches`, {
       headers: { 'X-TBA-Auth-Key': process.env.EXPO_PUBLIC_TBA_API_KEY }
     });
