@@ -117,7 +117,10 @@ export default function HomeScreen() {
         return;
       }
 
-      const alliance = scoutingData.alliance[0].toLowerCase();
+      const alliance = (Array.isArray(scoutingData.alliance) 
+      ? scoutingData.alliance[0] 
+      : scoutingData.alliance
+    ).toLowerCase();
       const positionIndex = parseInt(scoutingData.position[0]) - 1;
       const teamKey = match.alliances[alliance].team_keys[positionIndex];
       const teamNumber = parseInt(teamKey.replace('frc', ''));
