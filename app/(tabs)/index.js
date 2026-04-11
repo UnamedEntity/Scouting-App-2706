@@ -92,7 +92,7 @@ export default function HomeScreen() {
 
 useEffect(() => {
   const fetchTeam = async () => {
-    if (!scoutingData.matchNumber || !scoutingData.alliance.length || !scoutingData.position.length) return;
+    if (!scoutingData.matchNumber || !scoutingData.alliance || !scoutingData.position) return;
 
     try {
       const eventKey = '2024nyny';
@@ -101,36 +101,33 @@ useEffect(() => {
       });
 
       const matches = await res.json();
-
-  // Add this:
-  if (!Array.isArray(matches)) {
-    console.error('TBA did not return an array:', matches);
-    return;
-  }
+      if (!Array.isArray(matches)) return;
 
       const match = matches.find(m => m.match_number === scoutingData.matchNumber && m.comp_level === 'qm');
       if (!match) return;
 
-      const alliance = (Array.isArray(scoutingData.alliance)
+      // Handle alliance whether it's an array ["Red"] or a string "Red"
+      const allianceRaw = Array.isArray(scoutingData.alliance)
         ? scoutingData.alliance[0]
-        : scoutingData.alliance
-      ).toLowerCase();
+        : scoutingData.alliance;
+      const alliance = allianceRaw.toLowerCase(); // "red" or "blue"
 
-      const positionIndex = parseInt(
-        Array.isArray(scoutingData.position) ? scoutingData.position[0] : scoutingData.position
-      ) - 1;
+      // Handle position whether it's an array ["1"] or a string "1"
+      const positionRaw = Array.isArray(scoutingData.position)
+        ? scoutingData.position[0]
+        : scoutingData.position;
+      const positionIndex = parseInt(positionRaw) - 1;
 
-      if (!match.alliances[alliance]) {
-        console.error('Alliance not found:', alliance, match.alliances);
-        return;
-      }
+      if (!match.alliances[alliance]) return;
 
       const teamKey = match.alliances[alliance].team_keys[positionIndex];
+      if (!teamKey) return;
+
       const teamNumber = parseInt(teamKey.replace('frc', ''));
       setScoutingData(prev => ({ ...prev, teamNumber }));
 
     } catch (err) {
-      console.error('TBA fetch error:', err);
+      // silently fail
     }
   };
 
@@ -148,11 +145,13 @@ useEffect(() => {
   const finalClimbOptions = ['No Climb', 'Attempted Climb but Failed', 'Level 1', 'Level 2', 'Level 3'];
   const climbOptions = ['Did Not Attempt', 'Attempted Climb but Failed', 'Climb Succesful'];
 
-  // Handlers
-  const handleSingleSelect = (field, value) => {
+const handleSingleSelect = (field, value) => {
+  if (field === 'alliance' || field === 'position') {
+    setScoutingData({ ...scoutingData, [field]: [value] });
+  } else {
     setScoutingData({ ...scoutingData, [field]: value });
-  };
-
+  }
+};
   const handleClear = () => {
     setScoutingData(initialScoutingData);
     setSubmittedText('');
