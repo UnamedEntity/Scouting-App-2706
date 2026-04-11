@@ -102,6 +102,12 @@ useEffect(() => {
 
       const matches = await res.json();
 
+  // Add this:
+  if (!Array.isArray(matches)) {
+    console.error('TBA did not return an array:', matches);
+    return;
+  }
+
       const match = matches.find(m => m.match_number === scoutingData.matchNumber && m.comp_level === 'qm');
       if (!match) return;
 
