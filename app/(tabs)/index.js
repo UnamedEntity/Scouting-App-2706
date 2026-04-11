@@ -103,7 +103,7 @@ useEffect(() => {
       const matches = await res.json();
       if (!Array.isArray(matches)) return;
 
-      const match = matches.find(m => m.match_number === scoutingData.matchNumber && m.comp_level === 'qm');
+      const match = matches.find(m => m.match_number === parseInt(scoutingData.matchNumber) && m.comp_level === 'qm');
       if (!match) return;
 
       // Handle alliance whether it's an array ["Red"] or a string "Red"
