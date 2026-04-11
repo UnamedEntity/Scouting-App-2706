@@ -92,27 +92,48 @@ export default function HomeScreen() {
 
   useEffect(() => {
   const fetchTeam = async () => {
-    if (!scoutingData.matchNumber || !scoutingData.alliance.length || !scoutingData.position.length) return;
+    if (!scoutingData.matchNumber || !scoutingData.alliance.length || !scoutingData.position.length) {
+      console.log('Skipping fetch — missing matchNumber, alliance, or position');
+      return;
+    }
 
-    const eventKey = '2024nyny'; // ← change this to your event key
-    const res = await fetch(`https://www.thebluealliance.com/api/v3/event/${eventKey}/matches`, {
-      headers: { 'X-TBA-Auth-Key': process.env.EXPO_PUBLIC_TBA_API_KEY }
-    });
-    const matches = await res.json();
+    console.log('Fetching for match:', scoutingData.matchNumber, 'alliance:', scoutingData.alliance, 'position:', scoutingData.position);
 
-    const match = matches.find(m => m.match_number === scoutingData.matchNumber && m.comp_level === 'qm');
-    if (!match) return;
+    try {
+      const eventKey = '2024nyny';
+      const res = await fetch(`https://www.thebluealliance.com/api/v3/event/${eventKey}/matches`, {
+        headers: { 'X-TBA-Auth-Key': process.env.EXPO_PUBLIC_TBA_API_KEY }
+      });
 
-    const alliance = scoutingData.alliance[0].toLowerCase();
-    const positionIndex = parseInt(scoutingData.position[0]) - 1;
-    const teamKey = match.alliances[alliance].team_keys[positionIndex];
-    const teamNumber = parseInt(teamKey.replace('frc', ''));
+      console.log('TBA response status:', res.status);
+      const matches = await res.json();
+      console.log('Total matches returned:', matches.length);
 
-    setScoutingData(prev => ({ ...prev, teamNumber }));
+      const match = matches.find(m => m.match_number === scoutingData.matchNumber && m.comp_level === 'qm');
+      console.log('Found match:', match);
+
+      if (!match) {
+        console.log('No match found for number:', scoutingData.matchNumber);
+        return;
+      }
+
+      const alliance = scoutingData.alliance[0].toLowerCase();
+      const positionIndex = parseInt(scoutingData.position[0]) - 1;
+      const teamKey = match.alliances[alliance].team_keys[positionIndex];
+      const teamNumber = parseInt(teamKey.replace('frc', ''));
+
+      console.log('Team number found:', teamNumber);
+      setScoutingData(prev => ({ ...prev, teamNumber }));
+
+    } catch (err) {
+      console.error('TBA fetch error:', err);
+    }
   };
 
   fetchTeam();
 }, [scoutingData.matchNumber, scoutingData.alliance, scoutingData.position]);
+
+
 
   // Options
   const allianceOptions = ['Red', 'Blue'];
